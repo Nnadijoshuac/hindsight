@@ -94,6 +94,12 @@ impl Vault {
         self.auto_limit = auto_limit.0;
     }
 
+    /// Hand the agent role to another account, e.g. when rotating or replacing the AI agent.
+    pub fn set_agent(&mut self, agent: AccountId) {
+        self.assert_owner();
+        self.agent = agent;
+    }
+
     pub fn add_payee(&mut self, payee: AccountId) {
         self.assert_owner();
         self.payees.insert(payee);
@@ -318,6 +324,21 @@ mod tests {
         ctx("owner.testnet", 3);
         v.approve(r.id).detach();
         assert_eq!(v.get_requests(None, None)[0].status, Status::Paid);
+    }
+
+    #[test]
+    fn owner_can_replace_the_agent() {
+        let mut v = setup();
+        v.set_agent(acc("new-agent.testnet"));
+        assert_eq!(v.get_policy().agent, acc("new-agent.testnet"));
+    }
+
+    #[test]
+    #[should_panic(expected = "only the owner")]
+    fn agent_cannot_reassign_itself() {
+        let mut v = setup();
+        ctx("agent.testnet", 2);
+        v.set_agent(acc("agent.testnet"));
     }
 
     #[test]
