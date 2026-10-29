@@ -1,0 +1,11 @@
+{
+  "name": "@hindsight/intents",
+  "private": true,
+  "version": "0.1.0",
+  "description": "NEAR Intents 1Click client",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "@hindsight/verify",
+  "private": true,
+  "version": "0.1.0",
+  "description": "NEAR AI Cloud TEE attestation and private inference",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*"
+  }
+}
