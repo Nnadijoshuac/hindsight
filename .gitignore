@@ -1,0 +1,11 @@
+node_modules/
+target/
+.env
+*.log
+.DS_Store
+
+# Private working notes: research, strategy, and build-session material (never published)
+research/
+notes/
+.claude/
+CLAUDE.md

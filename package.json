@@ -1,0 +1,56 @@
+{
+  "name": "hindsight",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Hindsight: private AI cashflow forecasting on NEAR. Verifiable TEE inference (NEAR AI Cloud attestation), cross-chain stablecoin moves via NEAR Intents 1Click, and an on-chain spending-policy vault for AI agents.",
+  "keywords": [
+    "near",
+    "near-protocol",
+    "near-intents",
+    "1click",
+    "confidential-intents",
+    "near-ai",
+    "near-ai-cloud",
+    "tee",
+    "intel-tdx",
+    "nvidia-confidential-computing",
+    "attestation",
+    "private-ai",
+    "verifiable-inference",
+    "ai-agent",
+    "agent-guardrails",
+    "spending-limits",
+    "smart-contract",
+    "cashflow-forecast",
+    "personal-finance",
+    "stablecoin",
+    "usdc",
+    "real-world-money",
+    "near-hackathon"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "test": "node --test \"packages/*/test/*.test.ts\"",
+    "check:attest": "node --env-file-if-exists=.env packages/verify/src/cli.ts",
+    "forecast": "node packages/forecast/src/cli.ts",
+    "check:chat": "node --env-file-if-exists=.env packages/verify/src/chat-cli.ts",
+    "check:quote": "node --env-file-if-exists=.env packages/intents/src/cli.ts",
+    "build:contract": "cd contracts/vault && cross-env RUSTFLAGS=\"-C link-arg=-s -C target-cpu=mvp\" cargo build --target wasm32-unknown-unknown --release",
+    "test:contract": "cargo test --manifest-path contracts/vault/Cargo.toml"
+  },
+  "dependencies": {
+    "@noble/curves": "^1.9.7",
+    "@noble/hashes": "^1.8.0",
+    "@phala/dcap-qvl": "0.7.0"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3"
+  }
+}
