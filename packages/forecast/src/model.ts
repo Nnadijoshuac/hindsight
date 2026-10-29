@@ -137,3 +137,31 @@ export function backtest(txns: Txn[], windows = [3, 6, 12, 24], origins = 10, ho
     return { trainMonths: window, errorPct: Math.round((1000 * totalError) / totalSpent) / 10 };
   });
 }
+
+/** Backtest averaged over several histories, so one lucky person can't flatter the result. */
+export function panelBacktest(histories: Txn[][]): BacktestRow[] {
+  const runs = histories.map((h) => backtest(h));
+  return runs[0].map((row, i) => ({
+    trainMonths: row.trainMonths,
+    errorPct: Math.round((10 * sum(runs.map((r) => r[i].errorPct))) / runs.length) / 10,
+  }));
+}
+
+export interface RunwaySummary {
+  points: BalancePoint[];
+  lowest: BalancePoint;
+  rent?: { date: string; balanceAfter: number; covered: boolean };
+}
+
+/** The answer to "am I going to be okay?": projected balance, its low point, and the next rent. */
+export function runway(model: Model, from: string, startBalance: number, days = 45): RunwaySummary {
+  const points = projectBalance(model, from, startBalance, days);
+  const lowest = points.reduce((low, p) => (p.balance < low.balance ? p : low));
+  const rentBill = model.bills.find((b) => /RENT/i.test(b.name));
+  const rentDay = rentBill && points.find((p) => p.events.includes(rentBill.name));
+  return {
+    points,
+    lowest,
+    rent: rentDay && { date: rentDay.date, balanceAfter: rentDay.balance, covered: rentDay.balance >= 0 },
+  };
+}

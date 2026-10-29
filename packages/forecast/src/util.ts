@@ -47,3 +47,11 @@ export function groupBy<T>(items: T[], key: (item: T) => string): Map<string, T[
   }
   return groups;
 }
+
+// ---- formatting ----
+
+/** Cents -> "$1,234.56" (or "-$1,234.56"). */
+export function formatUsd(cents: number): string {
+  const dollars = Math.abs(cents / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return `${cents < 0 ? '-' : ''}$${dollars}`;
+}
