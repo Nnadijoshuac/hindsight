@@ -25,6 +25,14 @@ function privacyChecks(p?: PrivacyView): [string, boolean][] {
   return p.hasGpuEvidence ? [...checks, ['gpu', true]] : checks;
 }
 
+// What happened to a payment request, in plain words.
+function outcome(r: VaultView['requests'][number]): string {
+  if (r.status === 'Pending') return `Held: ${r.reason}`;
+  if (r.status === 'Failed') return 'Not sent · refunded';
+  if (r.status === 'Sending') return 'Sending…';
+  return r.status;
+}
+
 const Failed = ({ error }: { error?: string }) => error ? <p className="text-signal">Couldn't load: {error}</p> : null;
 
 export function ProofStrip({ forecast, privacy, vault, quote }: {
@@ -126,12 +134,12 @@ export function Agent({ vault, quote }: { vault: Loadable<VaultView>; quote: Loa
       )}
       {v && (v.requests.length ? (
         <table className="w-full text-left">
-          <thead><tr className="label-mono text-muted-foreground">{['Payee', 'Amount', 'Memo', 'Outcome'].map((h) => <th key={h} className="border-b border-foreground py-2.5 font-normal">{h}</th>)}</tr></thead>
+          <thead><tr className="label-mono text-muted-foreground">{['Payee', 'Amount', 'Memo', 'Outcome'].map((h) => <th key={h} className="border-b border-foreground py-2.5 pr-6 font-normal">{h}</th>)}</tr></thead>
           <tbody>
             {v.requests.map((r) => (
               <tr key={r.id} className="border-b border-border">
-                <td className="py-3.5">{r.payee}</td><td className="tabular-nums">{formatUsdc(r.amount)}</td><td>{r.memo}</td>
-                <td className={cn(r.status === 'Pending' && 'font-medium text-signal')}>{r.status === 'Pending' ? `Held: ${r.reason}` : r.status}</td>
+                <td className="py-3.5 pr-6">{r.payee}</td><td className="pr-6 tabular-nums">{formatUsdc(r.amount)}</td><td className="pr-6">{r.memo}</td>
+                <td className={cn(r.status === 'Pending' && 'font-medium text-signal')}>{outcome(r)}</td>
               </tr>
             ))}
           </tbody>
