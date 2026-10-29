@@ -24,6 +24,7 @@ npm install
 | 0 | `npm start`, then open http://localhost:3000 | Builds and serves the Next.js app. A laptop-sized app screen shows Ada's 45-day forecast (likely range, safety buffer, labelled pay days and bills), then a live proof strip, an animated 36-month history grid, the live TEE attestation checklist, the vault policy read from NEAR testnet, and a confidential NEAR Intents quote |
 | 1 | `npm run check:attest` | Gateway + model reports each list 7 ✓ checks; ends with `RESULT: TEE attestation verified` |
 | 1b | `npm run check:chat` *(needs `NEAR_AI_CLOUD_API_KEY`)* | A short model reply, then `RESULT: response signed by the attested TEE`: the answer is bound to our exact request and response bytes and signed by the verified hardware key |
+| 1c | open http://localhost:3000/api/insight *(needs `NEAR_AI_CLOUD_API_KEY`)* | JSON with a two-sentence cashflow insight, `verified: true`, the TEE signer, and how many transaction descriptions had personal data removed by NEAR AI's privacy filter |
 | 2 | `npm run check:quote -- 10 USDC:near USDC:base` | `DRY RUN (no funds move)` and a quote like `10 USDC:near -> 9.99 USDC:base` |
 | 3 | `npm run forecast` | Error chart falling from ~42% (3 months of history) to ~30% (24 months), averaged over 8 simulated freelancers, then a 45-day balance projection with a rent check |
 | 3b | `npm test` | 15 passing tests (attestation math, signature recovery, quote building, forecaster incl. "more history → lower error") |
@@ -59,7 +60,7 @@ npm install
 | | |
 |---|---|
 | ✅ Works | Live attestation verification, private TEE inference with verified response signatures, live dry-run + confidential quotes, forecaster with backtest, vault policy logic + tests, vault deployed on testnet |
-| 🔜 Next | Separate agent account + live guardrail demo, PII filter pass, AI categorisation and alerts, CSV upload in the web app |
+| 🔜 Next | CSV upload in the web app, live Paid transfer on testnet (needs faucet USDC), demo video |
 
 ## Libraries & AI assistance
 `@phala/dcap-qvl` (Intel DCAP quote verification), `@noble/curves` (EIP-191 signer recovery), `near-sdk` (Rust); web: Next.js 16, Tailwind CSS, shadcn/ui, React Bits, Motion, Geist fonts. Parts of this code were written with Claude Code.

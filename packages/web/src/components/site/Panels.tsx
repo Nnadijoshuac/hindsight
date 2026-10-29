@@ -2,7 +2,7 @@
 // The three proof sections (accuracy, privacy, agent) and the live proof strip above them.
 import CountUp from '@/components/CountUp';
 import type { Loadable } from '@/lib/api';
-import type { ForecastView, PrivacyView, QuoteView, VaultView } from '@/lib/types';
+import type { ForecastView, InsightView, PrivacyView, QuoteView, VaultView } from '@/lib/types';
 import { formatUsdc } from '@/lib/format';
 import { cn } from '@/lib/utils';
 import { Container, Split } from './Section';
@@ -84,7 +84,7 @@ export function Accuracy({ forecast }: { forecast: Loadable<ForecastView> }) {
   );
 }
 
-export function Privacy({ privacy }: { privacy: Loadable<PrivacyView> }) {
+export function Privacy({ privacy, insight }: { privacy: Loadable<PrivacyView>; insight: Loadable<InsightView> }) {
   const p = privacy.data;
   const note = privacy.error ? <Failed error={privacy.error} />
     : !p ? 'Fetching a fresh attestation from NEAR AI Cloud…'
@@ -92,6 +92,7 @@ export function Privacy({ privacy }: { privacy: Loadable<PrivacyView> }) {
     : <span className="text-signal">Verification failed, so no data was sent.</span>;
   return (
     <Split id="privacy" index="02 · Privacy" strong="Your data only goes to hardware" soft="we can verify." note={note}>
+      <PrivateInsight insight={insight} />
       <ul className="border-t border-foreground">
         {privacyChecks(p).map(([key, ok]) => (
           <li key={key} className="flex justify-between gap-6 border-b border-border py-4">
@@ -146,5 +147,25 @@ export function Agent({ vault, quote }: { vault: Loadable<VaultView>; quote: Loa
         </table>
       ) : <p className="label-mono text-muted-foreground">No payment requests yet</p>)}
     </Split>
+  );
+}
+
+/** The model's own words, produced inside a TEE, with the evidence for how they were produced. */
+function PrivateInsight({ insight }: { insight: Loadable<InsightView> }) {
+  const i = insight.data;
+  if (insight.error) return <p className="mb-10 text-muted-foreground">Private insight unavailable: {insight.error}</p>;
+  return (
+    <figure className="mb-12 border-l-2 border-signal pl-6">
+      <p className="label-mono mb-3 text-muted-foreground">Private insight</p>
+      <blockquote className="text-xl leading-relaxed text-balance">{i ? i.text : 'Asking the model inside its enclave…'}</blockquote>
+      {i && (
+        <figcaption className="mt-4 text-sm text-muted-foreground">
+          {i.linesSent} recent transactions passed the privacy filter first ({i.linesRedacted ? `${i.linesRedacted} had personal data removed` : 'no personal data found'}) ·{' '}
+          {i.verified
+            ? <span className="text-signal">reply signed by attested key {i.signer.slice(0, 10)}…, verified</span>
+            : <span className="text-signal">reply not verified: {i.reason}</span>}
+        </figcaption>
+      )}
+    </figure>
   );
 }

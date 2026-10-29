@@ -55,3 +55,6 @@ export function formatUsd(cents: number): string {
   const dollars = Math.abs(cents / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   return `${cents < 0 ? '-' : ''}$${dollars}`;
 }
+
+/** "GROCERY MART" -> "Grocery Mart". */
+export const titleCase = (s: string) => s.toLowerCase().replace(/\b\p{L}/gu, (c) => c.toUpperCase());

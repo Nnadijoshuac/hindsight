@@ -28,3 +28,13 @@ export interface QuoteView {
   quote: { amountOutFormatted: string; timeEstimate: number };
   quoteRequest: { confidentiality?: string };
 }
+
+export interface InsightView {
+  text: string;
+  verified: boolean;
+  signer: string;
+  reason?: string;
+  model: string;
+  linesSent: number;
+  linesRedacted: number;
+}

@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { demoPersona, parseCsv, toCsv } from '../src/data.ts';
 import { backtest, predictMonth, projectBalance, train } from '../src/model.ts';
+import { titleCase } from '../src/util.ts';
 
 test('demo persona is deterministic', () => {
   assert.deepEqual(demoPersona(3), demoPersona(3));
@@ -36,4 +37,9 @@ test('balance projection applies rent on the 1st', () => {
   const p = projectBalance(m, '2026-10-31', 100000, 3);
   assert.ok(p[0].events.includes('RENT LANDLORD LTD'));
   assert.ok(Number.isFinite(predictMonth(m, '2026-11')));
+});
+
+test('titleCase turns bank descriptions into readable names', () => {
+  assert.equal(titleCase('GROCERY MART'), 'Grocery Mart');
+  assert.equal(titleCase('CAFE / TRANSPORT'), 'Cafe / Transport');
 });
