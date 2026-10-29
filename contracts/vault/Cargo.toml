@@ -1,0 +1,23 @@
+[package]
+name = "hindsight-vault"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "Spending-policy vault: an AI agent can pay only within limits its human owner sets."
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+near-sdk = "5.6"
+
+[dev-dependencies]
+near-sdk = { version = "5.6", features = ["unit-testing"] }
+
+[profile.release]
+codegen-units = 1
+opt-level = "z"
+lto = true
+debug = false
+panic = "abort"
+overflow-checks = true
