@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hindsight: private cashflow forecast</title>
+  <meta name="description" content="Hindsight forecasts your cashflow from your own history, runs only on verified confidential hardware (NEAR AI Cloud TEE), and lets an AI agent move stablecoins via NEAR Intents within on-chain spending limits." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <nav class="nav wrap">
+    <a class="wordmark" href="#">Hindsight</a>
+    <div class="nav-links">
+      <a href="#accuracy-section">Accuracy</a>
+      <a href="#privacy-section">Privacy</a>
+      <a href="#agent-section">Agent</a>
+    </div>
+    <a class="button primary" href="#forecast">See your forecast</a>
+  </nav>
+
+  <header class="hero wrap">
+    <p class="label">Confidential AI <span class="chip" id="privacy-status">checking…</span></p>
+    <h1>Know if you'll make rent. <span class="soft">Before it becomes a problem.</span></h1>
+    <p class="lede">Hindsight forecasts your cashflow from your own history. The more you give it, the sharper it gets, and it only runs on hardware we can prove nobody can read.</p>
+    <div class="actions">
+      <a class="button primary" href="#forecast">See your forecast</a>
+      <a class="button" href="#privacy-section">How privacy is proven</a>
+    </div>
+  </header>
+
+  <!-- The product, shown the way the user sees it. -->
+  <section class="wrap" id="forecast">
+    <div class="window">
+      <div class="window-bar"><span class="dots"></span><span id="persona">Forecast</span><span class="mono" id="window-date"></span></div>
+      <div class="window-body">
+        <div class="answer">
+          <p class="mono muted">Next 45 days</p>
+          <p class="answer-headline" id="headline">Reading your history…</p>
+          <dl class="answer-stats">
+            <div><dt>Tightest day</dt><dd id="stat-low">–</dd></div>
+            <div><dt>Next rent</dt><dd id="stat-rent">–</dd></div>
+            <div><dt>History</dt><dd id="stat-history">–</dd></div>
+          </dl>
+        </div>
+        <svg id="runway-chart" class="runway" viewBox="0 0 800 260" role="img" aria-label="Projected balance for the next 45 days"></svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- Live proof strip: every number here is fetched live, nothing is hard-coded. -->
+  <section class="wrap proof">
+    <span class="mono">Live now</span>
+    <span>TEE checks passed <b id="proof-checks">–</b></span>
+    <span>Forecast error, 24 months <b id="proof-error">–</b></span>
+    <span>Vault daily cap <b id="proof-cap">–</b></span>
+    <span>Intents quote, 250 USDC <b id="proof-quote">–</b></span>
+  </section>
+
+  <main class="wrap">
+    <section class="split" id="accuracy-section">
+      <div>
+        <p class="label">01 · Accuracy</p>
+        <h2>It gets sharper <span class="soft">the longer you use it.</span></h2>
+        <p class="note">3-month cashflow forecast error by months of history. Identical held-out periods, averaged over 8 simulated freelancers. No cherry-picking.</p>
+      </div>
+      <div>
+        <p class="big-figure" id="accuracy-figure">–</p>
+        <div id="accuracy"></div>
+      </div>
+    </section>
+
+    <section class="split" id="privacy-section">
+      <div>
+        <p class="label">02 · Privacy</p>
+        <h2>Your data only goes to hardware <span class="soft">we can verify.</span></h2>
+        <p class="note" id="privacy-note">Fetching a fresh attestation from NEAR AI Cloud…</p>
+      </div>
+      <ul id="privacy-checks" class="checks"></ul>
+    </section>
+
+    <section class="split" id="agent-section">
+      <div>
+        <p class="label">03 · Agent</p>
+        <h2>The agent can pay, <span class="soft">within your limits.</span></h2>
+        <p class="note" id="vault-note">Reading the spending policy from NEAR testnet…</p>
+      </div>
+      <div>
+        <dl id="policy" class="stats"></dl>
+        <p id="quote" class="quote"></p>
+        <div id="requests"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="wrap">
+    <span class="wordmark">Hindsight</span>
+    <span>Private inference on NEAR AI Cloud · cross-chain moves via NEAR Intents · limits enforced by a NEAR contract. Demo data is simulated.</span>
+  </footer>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
