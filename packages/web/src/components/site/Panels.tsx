@@ -1,6 +1,8 @@
+'use client';
 // The three proof sections (accuracy, privacy, agent) and the live proof strip above them.
 import CountUp from '@/components/CountUp';
-import type { ForecastView, Loadable, PrivacyView, QuoteView, VaultView } from '@/lib/api';
+import type { Loadable } from '@/lib/api';
+import type { ForecastView, PrivacyView, QuoteView, VaultView } from '@/lib/types';
 import { formatUsdc } from '@/lib/format';
 import { cn } from '@/lib/utils';
 import { Container, Split } from './Section';
@@ -53,7 +55,7 @@ export function Accuracy({ forecast }: { forecast: Loadable<ForecastView> }) {
       <Failed error={forecast.error} />
       {first && last && (
         <>
-          <p className="mb-10 text-[clamp(56px,7vw,112px)] font-semibold leading-none tracking-[-0.05em] tabular-nums">
+          <p className="mb-10 text-[clamp(48px,6vw,88px)] font-semibold leading-none tracking-[-0.05em] tabular-nums">
             {first.errorPct}%<span className="mx-3 font-normal text-neutral-300">→</span>
             <CountUp from={first.errorPct} to={last.errorPct} decimals={1} duration={1.6} suffix="%" className="text-signal" />
           </p>

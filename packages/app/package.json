@@ -1,7 +1,0 @@
-{
-  "name": "@hindsight/app",
-  "private": true,
-  "version": "0.1.0",
-  "description": "Hindsight web app: private cashflow forecast, TEE privacy proof, and agent spending policy in one screen.",
-  "type": "module"
-}

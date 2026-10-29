@@ -1,3 +1,4 @@
+'use client';
 // Site navigation and footer.
 import { Button } from '@/components/ui/button';
 import { Container } from './Section';
@@ -7,7 +8,7 @@ const REPO = 'https://github.com/Nnadijoshuac/hindsight';
 export function Nav() {
   return (
     <nav className="sticky top-0 z-20 border-b border-transparent bg-white/80 backdrop-blur-md">
-      <Container className="flex h-18 items-center gap-10">
+      <Container className="flex h-16 items-center gap-10">
         <a href="#" className="text-lg font-semibold tracking-[-0.02em]">Hindsight</a>
         <div className="mr-auto hidden gap-8 text-[15px] text-neutral-600 md:flex">
           {['Accuracy', 'Privacy', 'Agent'].map((s) => <a key={s} href={`#${s.toLowerCase()}`} className="hover:text-foreground">{s}</a>)}
@@ -49,7 +50,7 @@ export function Footer() {
       {/* The wordmark, set large and cropped by the page edge: a quiet signature to close on. */}
       <div className="overflow-hidden">
         <Container>
-          <p aria-hidden className="select-none text-[clamp(96px,19vw,300px)] font-semibold leading-[0.78] tracking-[-0.06em] text-neutral-100">Hindsight</p>
+          <p aria-hidden className="select-none text-[clamp(88px,17vw,260px)] font-semibold leading-[0.78] tracking-[-0.06em] text-neutral-100">Hindsight</p>
         </Container>
       </div>
       <Container className="flex flex-wrap justify-between gap-4 border-t border-border py-6 text-sm text-muted-foreground">

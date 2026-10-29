@@ -8,8 +8,7 @@
 5. `npm run test:contract`: Rust unit tests for the vault (needs `cargo`).
 
 ## Layout
-- `packages/web`: React landing page (Vite + Tailwind + shadcn/ui + React Bits); `npm start` builds it and the API serves it
-- `packages/app`: API server (`/api/forecast`, `/api/privacy`, `/api/vault`, `/api/quote`)
+- `packages/web`: Next.js 16 app. `src/app/page.tsx` (prerendered landing page) and route handlers `src/app/api/{forecast,privacy,vault,quote}/route.ts`
 - `packages/forecast`: cashflow model, backtest and demo data
 - `packages/verify`: NEAR AI Cloud TEE attestation verification
 - `packages/intents`: NEAR Intents 1Click client

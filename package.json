@@ -37,8 +37,8 @@
     "packages/*"
   ],
   "scripts": {
-    "start": "npm run build && node --env-file-if-exists=.env packages/app/src/server.ts",
-    "dev": "node --env-file-if-exists=.env packages/app/src/server.ts & npm run dev -w @hindsight/web",
+    "start": "npm run build && npm run start -w @hindsight/web",
+    "dev": "npm run dev -w @hindsight/web",
     "build": "npm run build -w @hindsight/web",
     "test": "node --test \"packages/*/test/*.test.ts\"",
     "check:attest": "node --env-file-if-exists=.env packages/verify/src/cli.ts",

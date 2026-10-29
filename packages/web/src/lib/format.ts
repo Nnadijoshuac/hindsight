@@ -1,5 +1,5 @@
 // Display helpers. Money formatting is shared with the forecast package so it is defined once.
-export { formatUsd } from '@forecast/util.ts';
+export { formatUsd } from '@hindsight/forecast';
 
 const USDC_DECIMALS = 1_000_000;
 

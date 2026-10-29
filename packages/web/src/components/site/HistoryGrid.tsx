@@ -1,9 +1,10 @@
+'use client';
 // "Your history becomes foresight": every day of Ada's real history is a dot, laid out like a
 // contribution graph (weeks across, weekdays down). Months fill in from left to right, and at each
 // milestone the measured forecast error appears, so the claim is shown, not told.
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion, useInView } from 'motion/react';
-import type { ForecastView } from '@/lib/api';
+import type { ForecastView } from '@/lib/types';
 import { monthLabel } from '@/lib/format';
 import { cn } from '@/lib/utils';
 import { Container, Heading, Label } from './Section';
@@ -60,16 +61,16 @@ export function HistoryGrid({ forecast }: { forecast?: ForecastView }) {
         <div className="mb-20 grid gap-10 lg:grid-cols-12">
           <div className="lg:col-span-7">
             <Label className="mb-6">How it learns</Label>
-            <Heading strong="Your history becomes foresight." soft="Every day you add makes the next forecast sharper." className="text-4xl leading-[1.05] md:text-6xl" />
+            <Heading strong="Your history becomes foresight." soft="Every day you add makes the next forecast sharper." className="text-3xl leading-[1.08] md:text-[48px]" />
           </div>
           <dl className="grid grid-cols-2 gap-8 self-end lg:col-span-4 lg:col-start-9">
             <div>
               <dt className="label-mono text-muted-foreground">Months of history</dt>
-              <dd className="mt-2 text-6xl font-semibold tracking-[-0.05em] tabular-nums">{revealed}</dd>
+              <dd className="mt-2 text-5xl font-semibold tracking-[-0.05em] tabular-nums">{revealed}</dd>
             </div>
             <div>
               <dt className="label-mono text-muted-foreground">Forecast error</dt>
-              <dd className={cn('mt-2 text-6xl font-semibold tracking-[-0.05em] tabular-nums transition-colors duration-500', current && isBest(current.trainMonths) && 'text-signal')}>
+              <dd className={cn('mt-2 text-5xl font-semibold tracking-[-0.05em] tabular-nums transition-colors duration-500', current && isBest(current.trainMonths) && 'text-signal')}>
                 {current ? `${current.errorPct}%` : '–'}
               </dd>
             </div>
