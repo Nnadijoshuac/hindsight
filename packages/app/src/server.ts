@@ -6,6 +6,7 @@ import { readFile } from 'node:fs/promises';
 import { extname, join } from 'node:path';
 import { DEMO_START_BALANCE, demoAda, demoPanel } from '../../forecast/src/demo.ts';
 import { panelBacktest, runway, train } from '../../forecast/src/model.ts';
+import { dayOfMonth, distinctMonths, groupBy, monthKey } from '../../forecast/src/util.ts';
 import { buildQuoteRequest, findToken, getQuote, listTokens } from '../../intents/src/index.ts';
 import { verifyModel } from '../../verify/src/index.ts';
 import { viewCall } from './near.ts';
@@ -13,13 +14,25 @@ import { viewCall } from './near.ts';
 const PORT = Number(process.env.PORT ?? 3000);
 const VAULT = process.env.VAULT_ACCOUNT ?? 'hindsight-dev.testnet';
 const MODEL = 'deepseek-ai/DeepSeek-V4.1-Flash-1017';
-const PUBLIC_DIR = join(import.meta.dirname, '..', 'public');
-const MIME: Record<string, string> = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.svg': 'image/svg+xml' };
+// The React front end (packages/web) is built to static files and served from here.
+const PUBLIC_DIR = join(import.meta.dirname, '..', '..', 'web', 'dist');
+const MIME: Record<string, string> = {
+  '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.svg': 'image/svg+xml', '.woff2': 'font/woff2',
+};
 
 // The forecast is deterministic for the demo, so compute it once at startup.
 const ada = demoAda();
 const lastDate = ada[ada.length - 1].date;
+// Transactions per day, one row per month: drives the animated history grid on the landing page.
+const byMonth = groupBy(ada, (t) => monthKey(t.date));
+const activity = distinctMonths(ada.map((t) => t.date)).map((m) => {
+  const counts = Array<number>(31).fill(0);
+  for (const t of byMonth.get(m) ?? []) counts[dayOfMonth(t.date) - 1]++;
+  return { month: m, counts };
+});
+
 const forecast = {
+  activity,
   persona: 'Ada, freelance designer',
   transactions: ada.length,
   from: lastDate,

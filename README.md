@@ -21,7 +21,7 @@ npm install
 
 | Step | Command | Expected result |
 |---|---|---|
-| 0 | `npm start`, then open http://localhost:3000 | One screen: rent coverage and 45-day balance chart, accuracy-vs-history bars, live TEE privacy checklist, live vault policy from NEAR testnet, and a confidential NEAR Intents quote |
+| 0 | `npm start`, then open http://localhost:3000 | Builds the React app, then serves it. Landing page shows Ada's 45-day forecast in a product window, a live proof strip, an animated 36-month history grid with measured error at each milestone, the live TEE attestation checklist, the vault policy read from NEAR testnet, and a confidential NEAR Intents quote |
 | 1 | `npm run check:attest` | Gateway + model reports each list 7 ✓ checks; ends with `RESULT: TEE attestation verified` |
 | 1b | `npm run check:chat` *(needs `NEAR_AI_CLOUD_API_KEY`)* | A short model reply, then `RESULT: response signed by the attested TEE`: the answer is bound to our exact request and response bytes and signed by the verified hardware key |
 | 2 | `npm run check:quote -- 10 USDC:near USDC:base` | `DRY RUN (no funds move)` and a quote like `10 USDC:near -> 9.99 USDC:base` |
@@ -43,7 +43,8 @@ npm install
 
 | NEAR tech | Where |
 |---|---|
-| Web app (single screen, no framework) | [packages/app](packages/app) |
+| Web front end: React 19, Vite, Tailwind CSS 4, shadcn/ui, React Bits (CountUp, FadeContent), Motion | [packages/web](packages/web) |
+| API server (node:http) serving forecast, attestation, vault and quote data | [packages/app](packages/app) |
 | NEAR AI Cloud TEE inference + attestation | [packages/verify/src/index.ts](packages/verify/src/index.ts) |
 | NEAR Intents 1Click API (dry-run / confidential quotes) | [packages/intents/src/index.ts](packages/intents/src/index.ts) |
 | NEAR smart contract (spending policy vault), live on testnet at `hindsight-dev.testnet` | [contracts/vault/src/lib.rs](contracts/vault/src/lib.rs) |
@@ -62,7 +63,7 @@ npm install
 | 🔜 Next | Separate agent account + live guardrail demo, PII filter pass, AI categorisation and alerts, CSV upload in the web app |
 
 ## Libraries & AI assistance
-`@phala/dcap-qvl` (Intel DCAP quote verification), `near-sdk` (Rust). Parts of this code were written with Claude Code.
+`@phala/dcap-qvl` (Intel DCAP quote verification), `@noble/curves` (EIP-191 signer recovery), `near-sdk` (Rust); front end: React, Vite, Tailwind CSS, shadcn/ui, React Bits, Motion, Geist fonts. Parts of this code were written with Claude Code.
 
 ## License
 MIT. See [LICENSE](LICENSE).

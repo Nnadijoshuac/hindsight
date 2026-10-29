@@ -37,9 +37,11 @@
     "packages/*"
   ],
   "scripts": {
+    "start": "npm run build && node --env-file-if-exists=.env packages/app/src/server.ts",
+    "dev": "node --env-file-if-exists=.env packages/app/src/server.ts & npm run dev -w @hindsight/web",
+    "build": "npm run build -w @hindsight/web",
     "test": "node --test \"packages/*/test/*.test.ts\"",
     "check:attest": "node --env-file-if-exists=.env packages/verify/src/cli.ts",
-    "start": "node --env-file-if-exists=.env packages/app/src/server.ts",
     "forecast": "node packages/forecast/src/cli.ts",
     "check:chat": "node --env-file-if-exists=.env packages/verify/src/chat-cli.ts",
     "check:quote": "node --env-file-if-exists=.env packages/intents/src/cli.ts",

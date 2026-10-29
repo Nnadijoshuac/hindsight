@@ -8,6 +8,9 @@
 5. `npm run test:contract`: Rust unit tests for the vault (needs `cargo`).
 
 ## Layout
+- `packages/web`: React landing page (Vite + Tailwind + shadcn/ui + React Bits); `npm start` builds it and the API serves it
+- `packages/app`: API server (`/api/forecast`, `/api/privacy`, `/api/vault`, `/api/quote`)
+- `packages/forecast`: cashflow model, backtest and demo data
 - `packages/verify`: NEAR AI Cloud TEE attestation verification
 - `packages/intents`: NEAR Intents 1Click client
 - `contracts/vault`: NEAR contract enforcing the agent's spending policy
