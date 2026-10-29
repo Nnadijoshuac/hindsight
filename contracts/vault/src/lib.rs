@@ -8,6 +8,8 @@
 //! - Anything else becomes a pending request that only the owner can approve.
 //! - The owner can freeze the vault at any time (kill switch).
 //! - Every request records the hash of the attested AI inference that justified it.
+//! - A payment is only marked Paid once the token transfer is confirmed; if the transfer fails it
+//!   becomes Failed and the amount goes back into today's allowance.
 
 use near_sdk::json_types::U128;
 use near_sdk::store::{IterableMap, IterableSet};
@@ -15,6 +17,7 @@ use near_sdk::{env, near, require, AccountId, Gas, NearToken, PanicOnDefault, Pr
 
 const DAY_NS: u64 = 86_400_000_000_000;
 const GAS_FT_TRANSFER: Gas = Gas::from_tgas(10);
+const GAS_ON_TRANSFER: Gas = Gas::from_tgas(10);
 
 #[near(serializers = [json, borsh])]
 #[derive(Clone, PartialEq, Debug)]
@@ -22,7 +25,12 @@ pub enum Status {
     Pending,
     Paid,
     Rejected,
+    /// Transfer sent, waiting for the token contract to confirm.
+    Sending,
+    /// The token contract rejected the transfer; nothing left the vault.
+    Failed,
 }
+// New variants go at the end: Borsh stores the variant index, so existing records stay readable.
 
 #[near(serializers = [json, borsh])]
 #[derive(Clone, Debug)]
@@ -120,10 +128,8 @@ impl Vault {
         require!(!self.frozen, "vault is frozen");
         let mut req = self.requests.get(&id).cloned().expect("no such request");
         require!(req.status == Status::Pending, "request is not pending");
-        req.status = Status::Paid;
         req.reason = "approved by owner".into();
-        self.requests.insert(id, req.clone());
-        self.transfer(&req)
+        self.send(req)
     }
 
     pub fn reject(&mut self, id: u64) {
@@ -137,7 +143,8 @@ impl Vault {
 
     // ---------- agent entry point ----------
 
-    /// The agent asks to pay. Returns the request with its outcome: Paid (executed now) or Pending (needs owner).
+    /// The agent asks to pay. Returns the request with its outcome: Sending (within policy, transfer
+    /// started) or Pending (needs the owner).
     pub fn request_payment(&mut self, payee: AccountId, amount: U128, memo: String, attestation_ref: String) -> PaymentRequest {
         require!(env::predecessor_account_id() == self.agent, "only the agent can request payments");
         require!(!self.frozen, "vault is frozen");
@@ -157,7 +164,7 @@ impl Vault {
 
         let id = self.next_id;
         self.next_id += 1;
-        let mut req = PaymentRequest {
+        let req = PaymentRequest {
             id,
             token: self.token.clone(),
             payee,
@@ -169,13 +176,21 @@ impl Vault {
             reason: reason.unwrap_or("within policy").into(),
         };
         if reason.is_none() {
-            req.status = Status::Paid;
-            self.spent_today += amount.0;
-            self.transfer(&req).detach();
+            self.send(req.clone()).detach();
+            return self.requests.get(&id).cloned().expect("just stored");
         }
-        env::log_str(&format!("hindsight:request id={} status={:?} reason={}", id, req.status, req.reason));
-        self.requests.insert(id, req.clone());
+        self.record(req.clone());
         req
+    }
+
+    // ---------- transfer confirmation ----------
+
+    /// Callback from the token contract's ft_transfer. Only the vault itself may call it.
+    #[private]
+    pub fn on_transfer(&mut self, id: u64) -> Status {
+        // ft_transfer returns nothing, so only success matters; cap the read so a bad token cannot burn our gas.
+        let delivered = env::promise_result_checked(0, 64).is_ok();
+        self.settle(id, delivered)
     }
 
     // ---------- deposits (NEP-141 receiver) ----------
@@ -224,6 +239,41 @@ impl Vault {
         }
     }
 
+    /// Store a request and log it so indexers can follow every decision the vault makes.
+    fn record(&mut self, req: PaymentRequest) {
+        env::log_str(&format!("hindsight:request id={} status={:?} reason={}", req.id, req.status, req.reason));
+        self.requests.insert(req.id, req);
+    }
+
+    /// Start a transfer. The amount counts against today's allowance straight away, so the agent can't
+    /// race several payments past the cap while confirmations are in flight.
+    fn send(&mut self, mut req: PaymentRequest) -> Promise {
+        req.status = Status::Sending;
+        self.spent_today += req.amount.0;
+        let promise = self
+            .transfer(&req)
+            .then(Self::ext(env::current_account_id()).with_static_gas(GAS_ON_TRANSFER).on_transfer(req.id));
+        self.record(req);
+        promise
+    }
+
+    /// Final outcome of a transfer: Paid if the token contract confirmed it, otherwise Failed with the
+    /// amount returned to today's allowance.
+    fn settle(&mut self, id: u64, delivered: bool) -> Status {
+        let mut req = self.requests.get(&id).cloned().expect("no such request");
+        require!(req.status == Status::Sending, "request is not awaiting confirmation");
+        if delivered {
+            req.status = Status::Paid;
+        } else {
+            req.status = Status::Failed;
+            req.reason = "token transfer failed; amount returned to today's allowance".into();
+            self.spent_today = self.spent_today.saturating_sub(req.amount.0);
+        }
+        let status = req.status.clone();
+        self.record(req);
+        status
+    }
+
     fn transfer(&self, req: &PaymentRequest) -> Promise {
         Promise::new(req.token.clone()).function_call(
             "ft_transfer",
@@ -263,7 +313,7 @@ mod tests {
         let mut v = setup();
         ctx("agent.testnet", 2);
         let r = v.request_payment(acc("landlord.testnet"), U128(30 * USDC), "rent".into(), REF.into());
-        assert_eq!(r.status, Status::Paid);
+        assert_eq!(r.status, Status::Sending);
         assert_eq!(v.get_policy().spent_today.0, 30 * USDC);
     }
 
@@ -291,12 +341,12 @@ mod tests {
         let mut v = setup();
         ctx("agent.testnet", 2);
         for _ in 0..2 {
-            assert_eq!(v.request_payment(acc("landlord.testnet"), U128(40 * USDC), "x".into(), REF.into()).status, Status::Paid);
+            assert_eq!(v.request_payment(acc("landlord.testnet"), U128(40 * USDC), "x".into(), REF.into()).status, Status::Sending);
         }
         let r = v.request_payment(acc("landlord.testnet"), U128(40 * USDC), "x".into(), REF.into());
         assert_eq!(r.reason, "would exceed daily cap");
         ctx("agent.testnet", 2 + DAY_NS);
-        assert_eq!(v.request_payment(acc("landlord.testnet"), U128(40 * USDC), "x".into(), REF.into()).status, Status::Paid);
+        assert_eq!(v.request_payment(acc("landlord.testnet"), U128(40 * USDC), "x".into(), REF.into()).status, Status::Sending);
     }
 
     #[test]
@@ -323,7 +373,35 @@ mod tests {
         let r = v.request_payment(acc("landlord.testnet"), U128(50 * USDC), "rent".into(), REF.into());
         ctx("owner.testnet", 3);
         v.approve(r.id).detach();
-        assert_eq!(v.get_requests(None, None)[0].status, Status::Paid);
+        assert_eq!(v.get_requests(None, None)[0].status, Status::Sending);
+    }
+
+    #[test]
+    fn confirmed_transfer_becomes_paid() {
+        let mut v = setup();
+        ctx("agent.testnet", 2);
+        let r = v.request_payment(acc("landlord.testnet"), U128(30 * USDC), "rent".into(), REF.into());
+        assert_eq!(v.settle(r.id, true), Status::Paid);
+        assert_eq!(v.get_policy().spent_today.0, 30 * USDC);
+    }
+
+    #[test]
+    fn failed_transfer_is_recorded_and_refunds_the_allowance() {
+        let mut v = setup();
+        ctx("agent.testnet", 2);
+        let r = v.request_payment(acc("landlord.testnet"), U128(30 * USDC), "rent".into(), REF.into());
+        assert_eq!(v.settle(r.id, false), Status::Failed);
+        assert_eq!(v.get_policy().spent_today.0, 0);
+    }
+
+    #[test]
+    #[should_panic(expected = "not awaiting confirmation")]
+    fn a_transfer_cannot_be_settled_twice() {
+        let mut v = setup();
+        ctx("agent.testnet", 2);
+        let r = v.request_payment(acc("landlord.testnet"), U128(30 * USDC), "rent".into(), REF.into());
+        v.settle(r.id, true);
+        v.settle(r.id, false);
     }
 
     #[test]

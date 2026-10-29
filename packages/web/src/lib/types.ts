@@ -16,7 +16,7 @@ export interface ForecastView {
 export interface CheckResult { ok: boolean; signer: string; tcbStatus?: string; checks: Record<string, boolean> }
 export interface PrivacyView { model: string; ok: boolean; gateway: CheckResult; models: CheckResult[]; hasGpuEvidence: boolean }
 
-export interface PaymentRequest { id: number; payee: string; amount: string; memo: string; status: 'Pending' | 'Paid' | 'Rejected'; reason: string }
+export interface PaymentRequest { id: number; payee: string; amount: string; memo: string; status: 'Pending' | 'Sending' | 'Paid' | 'Rejected' | 'Failed'; reason: string }
 export interface VaultView {
   account: string;
   policy: { owner: string; agent: string; daily_cap: string; auto_limit: string; frozen: boolean; spent_today: string };

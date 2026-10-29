@@ -27,7 +27,7 @@ npm install
 | 2 | `npm run check:quote -- 10 USDC:near USDC:base` | `DRY RUN (no funds move)` and a quote like `10 USDC:near -> 9.99 USDC:base` |
 | 3 | `npm run forecast` | Error chart falling from ~42% (3 months of history) to ~30% (24 months), averaged over 8 simulated freelancers, then a 45-day balance projection with a rent check |
 | 3b | `npm test` | 15 passing tests (attestation math, signature recovery, quote building, forecaster incl. "more history → lower error") |
-| 4 | `npm run test:contract` | 8 passing vault tests: allowlist, auto-limit, daily cap, kill switch, owner-only approval |
+| 4 | `npm run test:contract` | 13 passing vault tests: allowlist, auto-limit, daily cap, kill switch, owner-only approval, agent rotation, confirmed and failed transfers |
 
 ## How it works
 ```
@@ -53,7 +53,7 @@ npm install
 |---|---|---|
 | Verifies TEE quote, nonce, signer, config, event log | `checkNearReport` in packages/verify/src/index.ts | packages/verify/test/verify.test.ts |
 | Quotes are dry-run by default | `buildQuoteRequest` in packages/intents/src/index.ts | packages/intents/test/intents.test.ts |
-| Agent can't pay unknown payees / over limits / when frozen | `request_payment` in contracts/vault/src/lib.rs | `cargo test` (8 tests) |
+| Agent can't pay unknown payees / over limits / when frozen | `request_payment` in contracts/vault/src/lib.rs | `cargo test` (13 tests) |
 
 ## What works / what's next
 | | |
