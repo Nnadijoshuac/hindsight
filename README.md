@@ -2,8 +2,11 @@
 
 **Foresight from your own hindsight.** A private money forecaster for people with irregular income. The more history you give it, the more accurate it gets, and nobody can read your data. We prove that with hardware attestation, not a privacy policy.
 
+Live: https://hindsight-near.vercel.app · Demo video (60 s): [docs/hindsight-launch.mp4](docs/hindsight-launch.mp4)
+
 > Built for NEAR HACKATHON (Nov 2026). Tracks: **Privacy & Private AI · Real-World Money · AI Security & Defense**.
-> Status: 🚧 feasibility stage. See [docs/FEASIBILITY.md](docs/FEASIBILITY.md).
+> My other entry is [Hive](https://github.com/Nnadijoshuac/hive) (live at https://hive-near.vercel.app): three AIs answer a task, a fourth grades them, and only passing answers get paid. Hive reuses this repo's NEAR AI verification code; the two projects are otherwise separate.
+> Status: the forecaster, live TEE attestation, signed private inference, confidential Intents quotes and the spending-policy vault on NEAR testnet all work. See [docs/FEASIBILITY.md](docs/FEASIBILITY.md) for the original plan.
 
 ## What it does
 1. **Forecasts your cashflow** (rent, bills, runway) from bank CSV exports and wallet history.
@@ -60,10 +63,13 @@ npm install
 | | |
 |---|---|
 | ✅ Works | Live attestation verification, private TEE inference with verified response signatures, live dry-run + confidential quotes, forecaster with backtest, vault policy logic + tests, vault deployed on testnet |
-| 🔜 Next | CSV upload in the web app, live Paid transfer on testnet (needs faucet USDC), demo video |
+| 🔜 Next | CSV upload in the web app, live paid transfer on testnet (needs faucet USDC) |
 
 ## Libraries & AI assistance
-`@phala/dcap-qvl` (Intel DCAP quote verification), `@noble/curves` (EIP-191 signer recovery), `near-sdk` (Rust); web: Next.js 16, Tailwind CSS, shadcn/ui, React Bits, Motion, Geist fonts. Parts of this code were written with Claude Code.
+`@phala/dcap-qvl` (Intel DCAP quote verification), `@noble/curves` (EIP-191 signer recovery), `near-sdk` (Rust); web: Next.js 16, Tailwind CSS, shadcn/ui, React Bits, Motion, Geist fonts. Parts of this code were written with Claude Code. Demo video made with HyperFrames; music "Free Uplifting Music" by Seth_Makes_Sounds (CC0, Freesound).
+
+## Built during the hackathon
+Every commit in this repo was made during NEAR HACKATHON (first commit Oct 29 2026), so there is no pre-hackathon baseline. The tag `hackathon-submission` marks the submitted state.
 
 ## License
 MIT. See [LICENSE](LICENSE).
