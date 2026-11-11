@@ -48,11 +48,6 @@
     "build:contract": "cd contracts/vault && cross-env RUSTFLAGS=\"-C link-arg=-s -C target-cpu=mvp\" cargo build --target wasm32-unknown-unknown --release",
     "test:contract": "cargo test --manifest-path contracts/vault/Cargo.toml"
   },
-  "dependencies": {
-    "@noble/curves": "^1.9.7",
-    "@noble/hashes": "^1.8.0",
-    "@phala/dcap-qvl": "0.7.0"
-  },
   "devDependencies": {
     "cross-env": "^7.0.3"
   }

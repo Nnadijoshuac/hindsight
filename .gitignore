@@ -9,3 +9,6 @@ research/
 notes/
 .claude/
 CLAUDE.md
+
+.vercel
+.env.local
